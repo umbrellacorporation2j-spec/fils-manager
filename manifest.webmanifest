@@ -1,13 +1,15 @@
 {
-  "name": "Manager",
-  "short_name": "Manager",
-  "lang": "ar",
-  "dir": "rtl",
-  "start_url": "./index.html",
+  "name": "Index Manager",
+  "short_name": "Index Manager",
+  "description": "مدير المشاريع والملفات HTML — يعمل دون إنترنت",
+  "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#111111",
-  "theme_color": "#0a3318",
+  "orientation": "portrait-primary",
+  "background_color": "#0a3318",
+  "theme_color": "#1b7a3a",
+  "lang": "ar",
+  "dir": "rtl",
   "icons": [
     {
       "src": "icon-192.png",

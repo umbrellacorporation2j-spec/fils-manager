@@ -1,0 +1,380 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f2f2f7">
+<title>Index Manager</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+:root{--bg:#f2f2f7;--card:#fff;--t:#000;--m:#8a8a8e;--sep:rgba(60,60,67,.16);--acc:#1b7a3a;--gl:rgba(249,249,251,.74);--fill:rgba(120,120,128,.12);--tile:#e3f4dc;--tilet:#1b6b34;--pill:#1e5c30;--pillt:#d9f7d0;--fab:#b8f2a3;--fabt:#0a3318;--sh:0 8px 24px rgba(0,0,0,.2)}
+[data-th=d]{--bg:#000;--card:#161b17;--t:#fff;--m:#9a9fa0;--sep:rgba(255,255,255,.12);--acc:#7fd98f;--gl:rgba(22,27,23,.72);--fill:rgba(255,255,255,.1);--tile:#1f3a27;--tilet:#b8f2a3;--sh:0 8px 24px rgba(0,0,0,.6)}
+*{box-sizing:border-box;margin:0;-webkit-tap-highlight-color:transparent}
+html{color-scheme:light dark}
+body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,"Noto Sans Arabic",system-ui,sans-serif;background:var(--bg);color:var(--t);min-height:100vh;padding-top:env(safe-area-inset-top)}
+[data-th=l] body{color-scheme:light}[data-th=d] body{color-scheme:dark}
+.noanim *,.noanim ::backdrop{animation:none!important;transition:none!important}
+.glass{background:var(--gl);backdrop-filter:saturate(180%) blur(22px);-webkit-backdrop-filter:saturate(180%) blur(22px)}
+.noglass .glass{background:var(--card);backdrop-filter:none;-webkit-backdrop-filter:none}
+.noglass dialog::backdrop,.noglass .scrim{backdrop-filter:none!important}
+#app{max-width:680px;margin:auto;padding:6px 16px 170px}
+.top{display:flex;justify-content:space-between;align-items:center;min-height:36px}
+.bk,.lk{background:none;border:0;color:var(--acc);font:inherit;font-size:1rem;display:flex;align-items:center;gap:2px;cursor:pointer;padding:6px 0}
+.bk .i{transform:scaleX(var(--fl,1))}[dir=rtl] .bk .i{transform:scaleX(-1)}
+h1{font-size:2.1rem;font-weight:800;letter-spacing:-.5px;margin:2px 0 14px}
+h2{font-size:.78rem;font-weight:600;color:var(--m);text-transform:uppercase;margin:20px 14px 7px}
+.i{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.grp{background:var(--card);border-radius:16px;overflow:hidden}
+.r{display:flex;align-items:center;gap:12px;padding:11px 14px;min-height:56px;position:relative;cursor:pointer;animation:in .3s ease both}
+.r+.r::before{content:"";position:absolute;top:0;inset-inline-start:66px;inset-inline-end:0;border-top:.5px solid var(--sep)}
+.r:active{background:var(--fill)}
+@keyframes in{from{opacity:0;transform:translateY(6px)}}
+.tile{width:40px;height:40px;border-radius:11px;background:var(--tile);color:var(--tilet);display:grid;place-items:center;flex:none}
+.rt{flex:1;min-width:0}.rt b{display:block;font-weight:600;font-size:1rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rt small{display:block;color:var(--m);font-size:.78rem;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dt{background:none;border:0;color:var(--m);padding:8px;cursor:pointer;border-radius:50%}.dt:active{background:var(--fill)}
+.pad{padding:14px}.bar{height:8px;background:var(--fill);border-radius:5px;overflow:hidden;margin:10px 0 6px}.bar i{display:block;height:100%;background:linear-gradient(90deg,#4caf50,#b8f2a3);border-radius:5px;transition:width .6s}
+.st3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px;text-align:center}.st3 b{display:block;font-size:1.4rem}.st3 small{color:var(--m)}
+.empty{text-align:center;color:var(--m);padding:44px 14px}
+.srch{width:100%;border:0;background:var(--fill);color:var(--t);border-radius:12px;padding:10px 14px;font:inherit;margin-bottom:12px}
+.seg{display:flex;background:var(--fill);border-radius:9px;padding:2px;gap:2px}.seg button{border:0;background:none;color:var(--t);font:inherit;font-size:.82rem;padding:6px 10px;border-radius:7px;cursor:pointer;transition:.2s}.seg .on{background:var(--card);box-shadow:0 1px 4px rgba(0,0,0,.25);font-weight:600}
+.sw{position:relative;width:51px;height:31px;flex:none}.sw input{opacity:0;position:absolute;inset:0;width:100%;height:100%;margin:0;z-index:2;cursor:pointer}.sw i{position:absolute;inset:0;background:rgba(120,120,128,.32);border-radius:16px;transition:.25s}.sw i::after{content:"";position:absolute;top:2px;inset-inline-start:2px;width:27px;height:27px;border-radius:50%;background:#fff;box-shadow:0 2px 5px rgba(0,0,0,.3);transition:.25s}.sw input:checked+i{background:#34c759}.sw input:checked+i::after{inset-inline-start:22px}
+#tabs{position:fixed;bottom:0;inset-inline:0;z-index:20;display:flex;justify-content:space-around;padding:7px 8px calc(7px + env(safe-area-inset-bottom));border-top:.5px solid var(--sep)}
+#tabs button{flex:1;background:none;border:0;color:var(--m);font:inherit;font-size:.68rem;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;transition:.2s;padding:4px}
+#tabs .tw{position:relative;display:flex;width:100%}
+#tabs .ind{position:absolute;top:0;bottom:0;inset-inline-start:0;width:25%;display:grid;place-items:center;pointer-events:none;transition:transform .45s cubic-bezier(.3,1.25,.4,1)}
+#tabs .ind i{width:74%;height:100%;border-radius:16px;background:var(--fill)}
+#tabs button{position:relative;z-index:1}
+#app{transition:opacity .14s ease,transform .14s ease}
+#app.pg-o{opacity:0;transform:translateX(calc(var(--d,1)*-16px))}
+#app.pg-i{animation:pgi .4s cubic-bezier(.2,.8,.2,1) both}
+@keyframes pgi{from{opacity:0;transform:translateX(calc(var(--d,1)*36px))}}
+#fab{transition:opacity .25s,transform .25s}#fab.hide{opacity:0;transform:scale(.7);pointer-events:none}
+#tabs .on{color:var(--acc)}#tabs .on .i{transform:scale(1.12)}#tabs .i{transition:.2s}
+#fab{position:fixed;inset-inline-end:18px;bottom:calc(84px + env(safe-area-inset-bottom));z-index:30;display:flex;flex-direction:column;align-items:flex-end}
+.scrim{position:fixed;inset:0;z-index:-1;background:rgba(0,0,0,.5);backdrop-filter:blur(6px);opacity:0;visibility:hidden;transition:.25s}
+.open .scrim{opacity:1;visibility:visible}
+.stack{display:flex;flex-direction:column-reverse;align-items:flex-end;gap:10px;margin-bottom:12px}
+.pill{display:flex;align-items:center;gap:12px;height:56px;padding:0 22px;border-radius:28px;background:var(--pill);color:var(--pillt);border:0;font:inherit;font-size:.95rem;font-weight:500;box-shadow:var(--sh);cursor:pointer;opacity:0;visibility:hidden;transform:translateY(24px) scale(.85);transform-origin:bottom;transition:.28s cubic-bezier(.2,.9,.3,1.15),visibility 0s .28s;transition-delay:calc((6 - var(--n))*20ms)}
+.open .pill{opacity:1;visibility:visible;transform:none;transition-delay:calc(var(--n)*35ms)}
+.pill.cam{background:#0d4a22}
+.fb{width:64px;height:64px;border-radius:22px;border:0;background:var(--fab);color:var(--fabt);display:grid;place-items:center;box-shadow:var(--sh);cursor:pointer;transition:.3s cubic-bezier(.2,.9,.3,1.2)}
+.fb .i{width:28px;height:28px;stroke-width:2.2;transition:.3s}
+.open .fb{width:56px;height:56px;border-radius:50%}.open .fb .i{transform:rotate(45deg)}
+dialog{margin:auto;background:var(--card);color:var(--t);border:0;border-radius:22px;padding:0;max-width:94vw;width:480px;max-height:90vh;overflow:auto;box-shadow:var(--sh);animation:in .25s ease}
+dialog::backdrop{background:rgba(0,0,0,.45);backdrop-filter:blur(4px)}
+dialog.sheet{margin:auto auto 8px;width:calc(100% - 16px);max-width:520px;background:var(--gl);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);animation:up .3s cubic-bezier(.2,.9,.3,1)}
+.noglass dialog.sheet{background:var(--card)}
+@keyframes up{from{transform:translateY(60px);opacity:0}}
+.mb{padding:18px}.sheet .mb{padding:0}.mb h3{margin-bottom:12px}
+.grab{width:38px;height:5px;border-radius:3px;background:var(--sep);margin:8px auto}
+.sht{text-align:center;color:var(--m);font-size:.8rem;padding:2px 14px 8px}
+.si{display:flex;align-items:center;gap:14px;width:100%;background:none;border:0;border-top:.5px solid var(--sep);color:var(--t);font:inherit;padding:15px 20px;cursor:pointer}.si:active{background:var(--fill)}
+.si.dn{color:#ff453a}.si.c{justify-content:center;font-weight:600;color:var(--acc)}
+.b{display:inline-flex;align-items:center;gap:6px;background:var(--fill);color:var(--acc);border:0;border-radius:12px;padding:10px 14px;font:inherit;font-size:.88rem;cursor:pointer}
+.g{background:var(--acc);color:var(--bg);font-weight:700}
+label{display:block;font-size:.82rem;color:var(--m);margin-bottom:10px}
+input:not([type=checkbox]),textarea{width:100%;margin-top:4px;background:var(--fill);color:var(--t);border:0;border-radius:11px;padding:11px;font:inherit}
+textarea{min-height:44vh;direction:ltr;font-family:monospace;font-size:.8rem}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.f{display:flex;align-items:center;gap:6px;padding:8px 0;border-bottom:.5px solid var(--sep);font-size:.8rem;direction:ltr}.f span{flex:1;word-break:break-all}.f small{color:var(--m)}
+.pv{width:100vw;max-width:100vw;height:100vh;max-height:100vh;border-radius:0}
+.pv .mb{padding:0;height:100%;display:flex;flex-direction:column}.pv .tp{display:flex;justify-content:space-between;align-items:center;padding:10px 14px}
+.pv iframe{flex:1;border:0;background:#fff;width:100%}
+#toast{position:fixed;bottom:calc(90px + env(safe-area-inset-bottom));inset-inline:16px;margin:auto;max-width:440px;background:var(--gl);backdrop-filter:blur(20px);border-radius:14px;padding:12px 16px;text-align:center;opacity:0;transform:translateY(16px);transition:.3s;pointer-events:none;z-index:99;box-shadow:var(--sh)}
+.noglass #toast{background:var(--card)}#toast.s{opacity:1;transform:none}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute"><defs>
+<symbol id="logo" viewBox="0 0 24 24"><path d="M3 7h6l2 2h10v10H3z"/><path d="M8 14h8"/></symbol>
+<symbol id="plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+<symbol id="up" viewBox="0 0 24 24"><path d="M12 15V3M7 8l5-5 5 5M5 21h14"/></symbol>
+<symbol id="down" viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></symbol>
+<symbol id="eye" viewBox="0 0 24 24"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></symbol>
+<symbol id="edit" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16zM13 7l4 4"/></symbol>
+<symbol id="trash" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></symbol>
+<symbol id="files" viewBox="0 0 24 24"><path d="M7 3h7l5 5v13H7zM14 3v5h5"/></symbol>
+<symbol id="tag" viewBox="0 0 24 24"><path d="M3 12V4h8l10 10-8 8z"/><path d="M7.5 7.5h.01"/></symbol>
+<symbol id="box" viewBox="0 0 24 24"><path d="M12 3l8 4v10l-8 4-8-4V7zM4 7l8 5 8-5M12 12v9"/></symbol>
+<symbol id="x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+<symbol id="home" viewBox="0 0 24 24"><path d="M3 11l9-8 9 8M5 10v10h14V10"/></symbol>
+<symbol id="folder" viewBox="0 0 24 24"><path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></symbol>
+<symbol id="fplus" viewBox="0 0 24 24"><path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2zM12 10v6M9 13h6"/></symbol>
+<symbol id="grid" viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></symbol>
+<symbol id="gear" viewBox="0 0 24 24"><path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1"/><circle cx="15" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="17" cy="18" r="2"/></symbol>
+<symbol id="chev" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></symbol>
+<symbol id="dots" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="19" cy="12" r="1.3"/></symbol>
+<symbol id="cam" viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13.5" r="3.5"/></symbol>
+<symbol id="clip" viewBox="0 0 24 24"><path d="M9 4h6v3H9zM7 5H5v16h14V5h-2M9 12h6M9 16h4"/></symbol>
+<symbol id="img" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="M21 16l-5-5-9 9"/></symbol>
+<symbol id="move" viewBox="0 0 24 24"><path d="M4 12h15M14 7l5 5-5 5"/></symbol>
+<symbol id="dl" viewBox="0 0 24 24"><path d="M4 4h16v16H4zM12 8v7M9 12l3 3 3-3"/></symbol>
+</defs></svg>
+<div id="app"></div>
+<div id="fab"></div>
+<nav id="tabs" class="glass"></nav>
+<input type="file" id="fi" accept=".html,.htm,.zip" multiple hidden>
+<input type="file" id="fd" webkitdirectory multiple hidden>
+<input type="file" id="fa" multiple hidden>
+<input type="file" id="fd2" webkitdirectory multiple hidden>
+<input type="file" id="fc" accept="image/*" capture="environment" hidden>
+<input type="file" id="fg" accept="image/*" multiple hidden>
+<div id="toast"></div>
+<script>
+const $=s=>document.querySelector(s);
+const cfg=Object.assign({theme:'auto',glass:true,anim:true,lang:localStorage.lang||'ar'},JSON.parse(localStorage.cfg||'{}'));
+let lang=cfg.lang;const L=(a,e)=>lang==='ar'?a:e;
+const saveCfg=()=>localStorage.cfg=JSON.stringify(cfg);
+function applyCfg(){const d=cfg.theme==='dark'||(cfg.theme==='auto'&&matchMedia('(prefers-color-scheme: dark)').matches);const h=document.documentElement;h.dataset.th=d?'d':'l';h.lang=lang;h.dir=lang==='ar'?'rtl':'ltr';document.body.classList.toggle('noglass',!cfg.glass);document.body.classList.toggle('noanim',!cfg.anim);$('meta[name=theme-color]').content=d?'#000':'#f2f2f7'}
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change',applyCfg);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const ic=n=>`<svg class="i"><use href="#${n}"/></svg>`;
+function toast(m){const e=$('#toast');e.textContent=m;e.className='s';clearTimeout(toast.t);toast.t=setTimeout(()=>e.className='',3500)}
+/* ---------- IndexedDB ---------- */
+const db=new Promise((res,rej)=>{const r=indexedDB.open('index-manager',2);r.onupgradeneeded=()=>{const d=r.result;['p','f'].forEach(n=>{if(!d.objectStoreNames.contains(n))d.createObjectStore(n,{keyPath:'id'})})};r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)});
+const tx=async(s,m,f)=>{const d=await db;return new Promise((res,rej)=>{const q=f(d.transaction(s,m).objectStore(s));q.onsuccess=()=>res(q.result);q.onerror=()=>rej(q.error)})};
+const all=s=>tx(s,'readonly',o=>o.getAll()),get=(s,id)=>tx(s,'readonly',o=>o.get(id)),put=(s,x)=>tx(s,'readwrite',o=>o.put(x)),del=(s,id)=>tx(s,'readwrite',o=>o.delete(id));
+async function migrate(){const ps=await all('p'),fs=await all('f');for(const p of ps){if(p.fid!==undefined)continue;let id=null;if(p.folder)for(const nm of p.folder.split('/').filter(Boolean)){let f=fs.find(x=>x.name===nm&&x.parent===id);if(!f){f={id:uid(),name:nm,parent:id,created:Date.now()};await put('f',f);fs.push(f)}id=f.id}p.fid=id;delete p.folder;await put('p',p)}}
+/* ---------- helpers ---------- */
+const MIME={html:'text/html',htm:'text/html',css:'text/css',js:'text/javascript',mjs:'text/javascript',json:'application/json',txt:'text/plain',md:'text/plain',svg:'image/svg+xml',xml:'application/xml',png:'image/png',jpg:'image/jpeg',jpeg:'image/jpeg',gif:'image/gif',webp:'image/webp',ico:'image/x-icon',avif:'image/avif',woff:'font/woff',woff2:'font/woff2',ttf:'font/ttf',otf:'font/otf',mp4:'video/mp4',webm:'video/webm',mp3:'audio/mpeg',wav:'audio/wav',pdf:'application/pdf',webmanifest:'application/manifest+json'};
+const ext=p=>(p.split('.').pop()||'').toLowerCase(),mime=p=>MIME[ext(p)]||'application/octet-stream';
+const isText=p=>/^(html|htm|css|js|mjs|json|txt|md|svg|xml|webmanifest)$/.test(ext(p));
+const norm=p=>p.replace(/\\/g,'/').split('/').filter(s=>s&&s!=='.'&&s!=='..').join('/');
+const safe=s=>(s||'').replace(/[\\/:*?"<>|\u0000-\u001f]/g,'-').trim().replace(/^\.+/,'');
+const fsize=n=>n>1073741824?(n/1073741824).toFixed(2)+' GB':n>1048576?(n/1048576).toFixed(1)+' MB':Math.max(1,Math.round(n/1024))+' KB';
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+const u8=async b=>new Uint8Array(await b.arrayBuffer());
+function dl(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.append(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},5000)}
+/* ---------- ZIP (native) ---------- */
+const CT=(()=>{const t=[];for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;t[n]=c>>>0}return t})();
+const crc32=d=>{let c=~0;for(let i=0;i<d.length;i++)c=CT[(c^d[i])&255]^(c>>>8);return ~c>>>0};
+const pipe=async(d,S)=>new Uint8Array(await new Response(new Blob([d]).stream().pipeThrough(new S('deflate-raw'))).arrayBuffer());
+const H=(n,f)=>{const v=new DataView(new ArrayBuffer(n));f(v);return new Uint8Array(v.buffer)};
+async function readZip(buf){
+ const v=new DataView(buf),u=new Uint8Array(buf);let e=-1;
+ for(let i=buf.byteLength-22;i>=Math.max(0,buf.byteLength-65558);i--)if(v.getUint32(i,true)===0x06054b50){e=i;break}
+ if(e<0)throw new Error('zip');
+ const n=v.getUint16(e+10,true);let p=v.getUint32(e+16,true);const out={},dec=new TextDecoder();
+ for(let i=0;i<n;i++){
+  if(v.getUint32(p,true)!==0x02014b50)throw new Error('zip');
+  const m=v.getUint16(p+10,true),cs=v.getUint32(p+20,true),nl=v.getUint16(p+28,true),xl=v.getUint16(p+30,true),cl=v.getUint16(p+32,true),lo=v.getUint32(p+42,true);
+  const name=dec.decode(u.subarray(p+46,p+46+nl));p+=46+nl+xl+cl;
+  if(name.endsWith('/'))continue;
+  const s=lo+30+v.getUint16(lo+26,true)+v.getUint16(lo+28,true);let d=u.subarray(s,s+cs);
+  if(m===8)d=await pipe(d,DecompressionStream);else if(m!==0)throw new Error('method');
+  out[name]=d}
+ return out}
+async function makeZip(list){
+ const enc=new TextEncoder(),parts=[],cd=[];let off=0;
+ for(const {n,d} of list){
+  const nb=enc.encode(n),crc=crc32(d);let c=d,m=0;
+  if(window.CompressionStream&&d.length>64){try{c=await pipe(d,CompressionStream);m=8}catch{c=d;m=0}}
+  parts.push(H(30,v=>{v.setUint32(0,0x04034b50,true);v.setUint16(4,20,true);v.setUint16(6,0x800,true);v.setUint16(8,m,true);v.setUint16(12,0x21,true);v.setUint32(14,crc,true);v.setUint32(18,c.length,true);v.setUint32(22,d.length,true);v.setUint16(26,nb.length,true)}),nb,c);
+  cd.push(H(46,v=>{v.setUint32(0,0x02014b50,true);v.setUint16(4,20,true);v.setUint16(6,20,true);v.setUint16(8,0x800,true);v.setUint16(10,m,true);v.setUint16(14,0x21,true);v.setUint32(16,crc,true);v.setUint32(20,c.length,true);v.setUint32(24,d.length,true);v.setUint16(28,nb.length,true);v.setUint32(42,off,true)}),nb);
+  off+=30+nb.length+c.length}
+ const cds=cd.reduce((a,b)=>a+b.length,0);
+ return new Blob([...parts,...cd,H(22,v=>{v.setUint32(0,0x06054b50,true);v.setUint16(8,list.length,true);v.setUint16(10,list.length,true);v.setUint32(12,cds,true);v.setUint32(16,off,true)})],{type:'application/zip'})}
+/* ---------- Import ---------- */
+function build(name,map){
+ const m2={};for(const k of Object.keys(map)){const n=norm(k);if(n&&!/(^|\/)(__MACOSX|\.DS_Store)(\/|$)/.test(n))m2[n]=map[k]}
+ let ks=Object.keys(m2);
+ if(ks.length&&ks.every(k=>k.includes('/'))&&new Set(ks.map(k=>k.split('/')[0])).size===1){const r={};ks.forEach(k=>r[k.slice(k.indexOf('/')+1)]=m2[k]);ks=Object.keys(r);return fin(name,r,ks)}
+ return fin(name,m2,ks)}
+function fin(name,m,ks){
+ const htmls=ks.filter(k=>/\.html?$/i.test(k));if(!htmls.length)throw new Error('nohtml');
+ const main=ks.includes('index.html')?'index.html':htmls.sort((a,b)=>a.split('/').length-b.split('/').length||a.length-b.length)[0];
+ const files={};ks.forEach(k=>files[k]=m[k] instanceof Blob?m[k]:new Blob([m[k]],{type:mime(k)}));
+ return {id:uid(),name,fid:null,main,created:Date.now(),files}}
+async function importFiles(fl){
+ fl=[...fl];if(!fl.length)return;let n=0;const fid=curF();
+ const add=async p=>{p.fid=fid;await put('p',p);n++};
+ try{
+  if(fl[0].webkitRelativePath){const m={};fl.forEach(f=>m[f.webkitRelativePath]=f);await add(build(fl[0].webkitRelativePath.split('/')[0],m))}
+  else for(const f of fl){
+   const base=f.name.replace(/\.[^.]+$/,'');
+   try{
+    if(/\.zip$/i.test(f.name))await add(build(base,await readZip(await f.arrayBuffer())));
+    else if(/\.html?$/i.test(f.name))await add(build(base,{'index.html':f}));
+    else toast(L('نوع غير مدعوم: ','Unsupported: ')+f.name)}
+   catch(e){toast(e.message==='nohtml'?L('لا يوجد ملف HTML داخل ','No HTML file in ')+f.name:e.message==='method'?L('طريقة ضغط غير مدعومة في ','Unsupported compression in ')+f.name:L('ملف ZIP تالف أو غير صالح: ','Invalid ZIP: ')+f.name);console.error(e)}}
+ }catch(e){toast(e.message==='nohtml'?L('لا يوجد ملف HTML داخل المجلد','No HTML file in folder'):L('فشل الاستيراد','Import failed'));console.error(e)}
+ if(n)toast(L('تم استيراد ','Imported ')+n+L(' مشروع',' project(s)'));render()}
+async function imgPage(fl,name){
+ fl=[...fl];if(!fl.length)return;const m={};let h='';
+ fl.forEach((f,i)=>{const e=ext(f.name)||'jpg',k='img-'+(i+1)+'.'+e;m[k]=new Blob([f],{type:f.type||mime(k)});h+=`<img src="${k}" alt="">`});
+ m['index.html']=new Blob([`<!doctype html>\n<html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(name)}</title><style>body{margin:0;background:#111;text-align:center}img{max-width:100%;display:block;margin:12px auto}</style></head><body>${h}</body></html>`],{type:'text/html'});
+ const p=build(name,m);p.fid=curF();await put('p',p);toast(L('تمت الإضافة','Added'));render()}
+/* ---------- UI helpers ---------- */
+function modal(h,c){const d=document.createElement('dialog');if(c)d.className=c;d.innerHTML=`<div class="mb">${h}</div>`;document.body.append(d);d.addEventListener('close',()=>d.remove());d.showModal();return d}
+function ask(title,fields,ok){return new Promise(res=>{
+ const d=modal(`<h3>${title}</h3><form>${fields.map(f=>`<label>${f[1]}<input name="${f[0]}" value="${esc(f[2]||'')}" placeholder="${esc(f[3]||'')}"></label>`).join('')}<div class="row"><button type="submit" class="b g">${ok}</button><button type="button" class="b" data-x>${L('إلغاء','Cancel')}</button></div></form>`);
+ const f=d.querySelector('form');let r=null;
+ f.onsubmit=e=>{e.preventDefault();r=Object.fromEntries(new FormData(f));d.close()};
+ d.querySelector('[data-x]').onclick=()=>d.close();
+ d.addEventListener('close',()=>res(r));
+ const i=d.querySelector('input');if(i)setTimeout(()=>i.focus(),80)})}
+function sheet(title,items){
+ const d=modal(`<div class="grab"></div>${title?`<div class="sht">${esc(title)}</div>`:''}${items.map((x,i)=>`<button class="si${x.d?' dn':''}" data-i="${i}">${ic(x.i||'dots')}<span>${x.t}</span></button>`).join('')}<button class="si c" data-i="-1"><span>${L('إلغاء','Cancel')}</span></button>`,'sheet');
+ d.addEventListener('click',e=>{const b=e.target.closest('[data-i]');if(b){d.close();const x=items[+b.dataset.i];if(x&&x.f)setTimeout(x.f,60)}else if(e.target===d)d.close()})}
+/* ---------- State ---------- */
+const S={tab:'home',path:[],q:'',dir:0};const TABS=['home','folders','projects','settings'];
+function go(fn,d){S.dir=d;if(!cfg.anim){fn();return render()}const ap=$('#app');ap.style.setProperty('--d',d);ap.classList.add('pg-o');setTimeout(()=>{fn();render()},140)}
+function tabsUI(act){const el=$('#tabs'),icn={home:'home',folders:'folder',projects:'grid',settings:'gear'},lb={home:L('الرئيسية','Home'),folders:L('المجلدات','Folders'),projects:L('المشاريع','Projects'),settings:L('الإعدادات','Settings')};
+ if(el.dataset.l!==lang){el.dataset.l=lang;el.innerHTML=`<div class="tw"><div class="ind"><i></i></div>${TABS.map(t=>`<button data-a="tab" data-v="${t}">${ic(icn[t])}${lb[t]}</button>`).join('')}</div>`}
+ el.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.v===act));
+ el.querySelector('.ind').style.transform=`translateX(${(lang==='ar'?-1:1)*TABS.indexOf(act)*100}%)`}let P=[],F=[];
+const curF=()=>S.tab==='folders'?S.path[S.path.length-1]||null:null;
+const fp=id=>{const o=[];while(id){const f=F.find(x=>x.id===id);if(!f)break;o.unshift(f.name);id=f.parent}return o};
+const desc=id=>{const o=[id];F.filter(f=>f.parent===id).forEach(f=>o.push(...desc(f.id)));return o};
+const pBase=(p,skip=0)=>[...fp(p.fid).slice(skip).map(s=>safe(s)||'folder'),safe(p.name)||'project'].join('/');
+const psize=p=>Object.values(p.files).reduce((a,b)=>a+b.size,0);
+/* ---------- Render ---------- */
+const rowP=p=>`<div class="r" data-a="prev" data-id="${p.id}"><div class="tile">${ic('files')}</div><div class="rt"><b>${esc(p.name)}</b><small>${esc(fp(p.fid).join(' / ')||L('بدون مجلد','No folder'))} · ${Object.keys(p.files).length} ${L('ملف','files')} · ${fsize(psize(p))}</small></div><button class="dt" data-a="menu" data-id="${p.id}">${ic('dots')}</button></div>`;
+const rowF=f=>{const a=F.filter(x=>x.parent===f.id).length,b=P.filter(x=>x.fid===f.id).length;return `<div class="r" data-a="enter" data-id="${f.id}"><div class="tile">${ic('folder')}</div><div class="rt"><b>${esc(f.name)}</b><small>${a} ${L('مجلد','folders')} · ${b} ${L('مشروع','projects')}</small></div>${ic('chev').replace('class="i"','class="i" style="color:var(--m);transform:scaleX(-1)"')}</div>`};
+const grp=h=>h?`<div class="grp">${h}</div>`:'';
+async function render(){
+ P=await all('p');F=await all('f');P.sort((a,b)=>b.created-a.created);F.sort((a,b)=>a.name.localeCompare(b.name));
+ if(S.tab==='folders')S.path=S.path.filter((id,i)=>F.some(f=>f.id===id));
+ const cur=curF(),T={home:L('الرئيسية','Home'),folders:cur?F.find(f=>f.id===cur).name:L('المجلدات','Folders'),projects:L('المشاريع','Projects'),settings:L('الإعدادات','Settings')};
+ $('#app').innerHTML=`<div class="top">${cur?`<button class="bk" data-a="up">${ic('chev')}${L('رجوع','Back')}</button><button class="lk" data-a="fmenu">${ic('dots')}</button>`:''}</div><h1>${esc(T[S.tab])}</h1><div id="body"></div>`;
+ await body();const ap=$('#app');ap.classList.remove('pg-o','pg-i');if(S.dir){ap.style.setProperty('--d',S.dir);void ap.offsetWidth;ap.classList.add('pg-i')}S.dir=0;
+ tabsUI(S.tab);
+ const acts=[['folder','fplus',L('مجلد جديد','New folder')],['paste','clip',L('لصق كود HTML','Paste HTML')],['new','edit',L('صفحة HTML جديدة','New HTML page')],['upload','up',L('تحميل HTML / ZIP','Upload HTML / ZIP')],['dir','files',L('استيراد مجلد','Import folder')],['gal','img',L('صور من المعرض','Photos')],['cam','cam',L('كاميرا','Camera')]];
+ $('#fab').className=S.tab==='settings'?'hide':'';
+ $('#fab').innerHTML=`<div class="scrim" data-a="fab"></div><div class="stack">${acts.map((a,i)=>`<button class="pill${a[0]==='cam'?' cam':''}" style="--n:${i}" data-a="fa" data-v="${a[0]}">${ic(a[1])}<span>${a[2]}</span></button>`).join('')}</div><button class="fb" data-a="fab" aria-label="+">${ic('plus')}</button>`}
+async function body(){
+ const b=$('#body');
+ if(S.tab==='home')b.innerHTML=await homeHTML();
+ else if(S.tab==='folders'){const cur=curF(),fs=F.filter(f=>(f.parent||null)===cur),ps=P.filter(p=>(p.fid||null)===cur);
+  b.innerHTML=(fs.length?grp(fs.map(rowF).join('')):'')+(ps.length?`${fs.length?'<h2>'+L('المشاريع','Projects')+'</h2>':''}${grp(ps.map(rowP).join(''))}`:'')||`<div class="empty">${L('لا يوجد شيء هنا. اضغط + للإضافة.','Nothing here. Tap + to add.')}</div>`}
+ else if(S.tab==='projects'){b.innerHTML=`<input class="srch" id="q" placeholder="${L('بحث','Search')}" value="${esc(S.q)}"><div id="lst"></div>`;lst();$('#q').oninput=e=>{S.q=e.target.value;lst()}}
+ else b.innerHTML=settingsHTML()}
+function lst(){const q=S.q.trim().toLowerCase(),ps=P.filter(p=>!q||p.name.toLowerCase().includes(q));$('#lst').innerHTML=ps.length?grp(ps.map(rowP).join('')):`<div class="empty">${L('لا توجد مشاريع','No projects')}</div>`}
+async function homeHTML(){
+ const est=navigator.storage?.estimate?await navigator.storage.estimate():{},fl=[];
+ P.forEach(p=>Object.entries(p.files).forEach(([k,b])=>fl.push({p,k,s:b.size})));
+ const tot=fl.reduce((a,b)=>a+b.s,0),big=[...fl].sort((a,b)=>b.s-a.s).slice(0,5),pc=est.quota?Math.max(1,Math.min(100,tot/est.quota*100)):1;
+ const gm={};fl.forEach(x=>{const k=x.k.split('/').pop()+'|'+x.s;(gm[k]=gm[k]||[]).push(x)});window.DUP=Object.values(gm).filter(g=>g.length>1&&g[0].s>0);
+ return `<div class="grp pad"><b>${L('مدير التخزين الذكي','Smart storage')}</b><div class="bar"><i style="width:${pc}%"></i></div><small style="color:var(--m)">${fsize(tot)} ${est.quota?L('من أصل ','of ')+fsize(est.quota)+L(' متاحة للتطبيق',' available'):''}</small><div class="st3"><div><b>${P.length}</b><small>${L('مشروع','projects')}</small></div><div><b>${F.length}</b><small>${L('مجلد','folders')}</small></div><div><b>${fl.length}</b><small>${L('ملف','files')}</small></div></div></div>`+
+ (big.length?`<h2>${L('أكبر الملفات','Largest files')}</h2>`+grp(big.map(x=>`<div class="r" data-a="files" data-id="${x.p.id}"><div class="tile">${ic('files')}</div><div class="rt"><b style="direction:ltr;text-align:start">${esc(x.k)}</b><small>${esc(x.p.name)} · ${fsize(x.s)}</small></div></div>`).join(''))+(DUP.length?`<div class="grp" style="margin-top:10px"><div class="r" data-a="dups"><div class="tile">${ic('box')}</div><div class="rt"><b>${L('ملفات مكررة محتملة','Possible duplicates')}: ${DUP.length}</b><small>${L('للمراجعة فقط، لا يُحذف شيء تلقائياً','Review only, nothing is deleted automatically')}</small></div></div></div>`:''):'')+
+ (P.length?`<h2>${L('الأحدث','Recent')}</h2>`+grp(P.slice(0,5).map(rowP).join('')):`<div class="empty">${L('ابدأ بالضغط على + لإنشاء مجلد أو استيراد مشروع.','Tap + to create a folder or import a project.')}</div>`)}
+const seg=(k,o)=>`<div class="seg">${o.map(x=>`<button class="${cfg[k]===x[0]?'on':''}" data-a="set" data-k="${k}" data-v="${x[0]}">${x[1]}</button>`).join('')}</div>`;
+const sw=(k,on)=>`<label class="sw"><input type="checkbox" data-s="${k}" ${on?'checked':''}><i></i></label>`;
+const sr=(t,s,c)=>`<div class="r" style="cursor:default"><div class="rt"><b>${t}</b>${s?`<small style="white-space:normal">${s}</small>`:''}</div>${c}</div>`;
+let persisted=false;navigator.storage?.persisted?.().then(v=>persisted=v);
+function settingsHTML(){return `<h2>${L('المظهر','Appearance')}</h2>`+grp(
+ sr(L('السمة','Theme'),'',seg('theme',[['auto',L('تلقائي','Auto')],['light',L('فاتح','Light')],['dark',L('داكن','Dark')]]))+
+ sr(L('التأثير الزجاجي','Glass effect'),L('أوقفه لتخفيف الضغط على الجوال','Turn off to reduce load on your phone'),sw('glass',cfg.glass))+
+ sr(L('الحركات والانتقالات','Animations'),'',sw('anim',cfg.anim))+
+ sr(L('اللغة','Language'),'',seg('lang',[['ar','عربي'],['en','English']])))+
+ `<h2>${L('التخزين والبيانات','Storage & data')}</h2>`+grp(
+ sr(L('تخزين دائم','Persistent storage'),L('يمنع المتصفح من مسح مشاريعك عند امتلاء الذاكرة','Stops the browser from clearing your projects when space is low'),sw('persist',persisted))+
+ `<div class="r" data-a="all"><div class="tile">${ic('box')}</div><div class="rt"><b>${L('تصدير كل المشاريع (GitHub)','Export everything (GitHub)')}</b><small>${L('ZIP واحد بمجلد لكل مشروع بحسب المجلدات','One ZIP, folders mirror your structure')}</small></div></div>`+
+ (deferred?`<div class="r" data-a="inst"><div class="tile">${ic('dl')}</div><div class="rt"><b>${L('تثبيت التطبيق','Install app')}</b></div></div>`:''))+
+ `<h2>${L('حول','About')}</h2>`+grp(sr('Index Manager','v2 · '+L('يعمل دون إنترنت، بياناتك محفوظة على جهازك فقط','Works offline, your data stays on this device'),''))}
+let deferred;addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferred=e});
+/* ---------- Events ---------- */
+document.addEventListener('change',async e=>{const k=e.target.dataset.s;if(!k)return;
+ if(k==='persist'){persisted=navigator.storage?.persist?await navigator.storage.persist():false;toast(persisted?L('تم تفعيل التخزين الدائم','Persistent storage on'):L('لم يمنح المتصفح الإذن (جرّب تثبيت التطبيق أولاً)','Not granted (try installing the app first)'));return render()}
+ cfg[k]=e.target.checked;saveCfg();applyCfg()});
+for(const [id,fn] of [['fi',importFiles],['fd',importFiles],['fc',f=>imgPage(f,L('صورة ','Photo ')+new Date().toLocaleDateString())],['fg',f=>imgPage(f,L('معرض صور ','Photos ')+new Date().toLocaleDateString())]])$('#'+id).onchange=e=>{const f=[...e.target.files];e.target.value='';fn(f)};
+document.addEventListener('click',async e=>{
+ const b=e.target.closest('[data-a]');if(!b||b.closest('dialog'))return;const a=b.dataset.a,id=b.dataset.id||b.closest('[data-id]')?.dataset.id;
+ if(a==='menu')e.stopPropagation();
+ try{
+  if(a==='tab'){const v=b.dataset.v;if(v===S.tab)return;const o=TABS.indexOf(S.tab),n=TABS.indexOf(v);tabsUI(v);return go(()=>{S.tab=v},(n>o?1:-1)*(lang==='ar'?-1:1))}
+  if(a==='set'){cfg[b.dataset.k]=b.dataset.v;if(b.dataset.k==='lang'){lang=b.dataset.v;localStorage.lang=lang}saveCfg();applyCfg();return render()}
+  if(a==='fab')return $('#fab').classList.toggle('open');
+  if(a==='fa'){$('#fab').classList.remove('open');const v=b.dataset.v;
+   if(v==='folder')return newFolder(curF());if(v==='paste')return pasteHtml();
+   if(v==='new'){const r=await ask(L('صفحة HTML جديدة','New HTML page'),[['name',L('اسم المشروع','Project name')]],L('إنشاء','Create'));if(!r)return;const n=r.name.trim();if(!n)return toast(L('اكتب اسم المشروع','Enter a name'));const p=build(n,{'index.html':new Blob([`<!doctype html>\n<html lang="ar" dir="rtl">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n<title>${esc(n)}</title>\n</head>\n<body>\n<h1>${esc(n)}</h1>\n</body>\n</html>\n`],{type:'text/html'})});p.fid=curF();await put('p',p);toast(L('تم الإنشاء','Created'));return render()}
+   return $({upload:'#fi',dir:'#fd',cam:'#fc',gal:'#fg'}[v]).click()}
+  if(a==='enter')return go(()=>S.path.push(id),lang==='ar'?-1:1);
+  if(a==='up')return go(()=>S.path.pop(),lang==='ar'?1:-1);
+  if(a==='fmenu'){const f=F.find(x=>x.id===curF());return sheet(f.name,[{t:L('مجلد فرعي جديد','New subfolder'),i:'fplus',f:()=>newFolder(f.id)},{t:L('إعادة تسمية','Rename'),i:'tag',f:async()=>{const r=await ask(L('إعادة تسمية المجلد','Rename folder'),[['n',L('الاسم','Name'),f.name]],L('حفظ','Save'));if(r&&r.n.trim()){f.name=r.n.trim();await put('f',f);render()}}},{t:L('تصدير المجلد ZIP','Export folder ZIP'),i:'down',f:()=>exportMany(desc(f.id),f.name,fp(f.id).length-1)},{t:L('حذف المجلد (يُنقل محتواه للأعلى)','Delete folder (contents move up)'),i:'trash',d:1,f:async()=>{if(!await ask(L('حذف المجلد «','Delete folder "')+f.name+L('»؟ لن تُحذف المشاريع بل تُنقل إلى المجلد الأعلى.','"? Projects are kept and moved up.'),[],L('حذف','Delete')))return;for(const x of F.filter(y=>y.parent===f.id)){x.parent=f.parent||null;await put('f',x)}for(const p of P.filter(y=>y.fid===f.id)){p.fid=f.parent||null;await put('p',p)}await del('f',f.id);S.path.pop();render()}}])}
+  if(a==='all')return exportMany(null,'index-manager-all',0);
+  if(a==='inst'&&deferred){deferred.prompt();deferred=null;return}
+  if(a==='dups')return sheet(L('ملفات متشابهة (الاسم والحجم)','Same name & size'),DUP.slice(0,12).map(g=>({t:esc(g[0].k.split('/').pop())+' · '+g.length+'×',i:'files',f:()=>files(g[0].p)})));
+  const p=id&&await get('p',id);if(!p)return;
+  if(a==='files')return files(p);
+  if(a==='prev')return preview(p);
+  if(a==='menu')return sheet(p.name,[
+   {t:L('معاينة','Preview'),i:'eye',f:()=>preview(p)},{t:L('الملفات والتعديل','Files & edit'),i:'edit',f:()=>files(p)},
+   {t:L('إعادة تسمية','Rename'),i:'tag',f:async()=>{const r=await ask(L('إعادة تسمية المشروع','Rename project'),[['n',L('الاسم','Name'),p.name]],L('حفظ','Save'));if(r&&r.n.trim()){p.name=r.n.trim();await put('p',p);render()}}},
+   {t:L('نقل إلى مجلد','Move to folder'),i:'move',f:()=>moveTo(p)},
+   {t:L('تصدير ZIP','Export ZIP'),i:'down',f:()=>exp(p,false)},{t:L('تصدير PWA','Export PWA'),i:'box',f:()=>exp(p,true)},
+   {t:L('حذف','Delete'),i:'trash',d:1,f:async()=>{if(!await ask(L('حذف «','Delete "')+p.name+L('» نهائياً؟','" permanently?'),[],L('حذف','Delete')))return;await del('p',p.id);toast(L('تم الحذف','Deleted'));render()}}])
+ }catch(err){console.error(err);toast(L('حدث خطأ: ','Error: ')+(err.message||''))}});
+async function newFolder(parent){const r=await ask(L('مجلد جديد','New folder'),[['n',L('اسم المجلد','Folder name')]],L('إنشاء','Create'));if(!r)return;const n=r.n.trim();if(!n)return toast(L('اكتب اسم المجلد','Enter a name'));await put('f',{id:uid(),name:n,parent:parent||null,created:Date.now()});S.tab='folders';render()}
+function moveTo(p){sheet(L('نقل إلى','Move to'),[{t:L('بدون مجلد','No folder'),i:'home',f:async()=>{p.fid=null;await put('p',p);render()}},...F.map(f=>({t:esc(fp(f.id).join(' / ')),i:'folder',f:async()=>{p.fid=f.id;await put('p',p);toast(L('تم النقل','Moved'));render()}}))])}
+function pasteHtml(){const d=modal(`<h3>${L('لصق كود HTML','Paste HTML')}</h3><label>${L('اسم المشروع','Project name')}<input id="pn"></label><textarea id="pt" placeholder="<!doctype html>…"></textarea><div class="row"><button class="b g" id="ps">${L('حفظ','Save')}</button><button class="b" id="pc">${L('إلغاء','Cancel')}</button></div>`);
+ d.querySelector('#pc').onclick=()=>d.close();d.querySelector('#ps').onclick=async()=>{const n=d.querySelector('#pn').value.trim(),t=d.querySelector('#pt').value;if(!n||!t.trim())return toast(L('اكتب الاسم والكود','Enter a name and code'));const p=build(n,{'index.html':new Blob([t],{type:'text/html'})});p.fid=curF();await put('p',p);d.close();toast(L('تم الحفظ','Saved'));render()}}
+/* ---------- Export ---------- */
+async function icon(txt,s){const c=document.createElement('canvas');c.width=c.height=s;const x=c.getContext('2d');const g=x.createLinearGradient(0,0,s,s);g.addColorStop(0,'#2e7d4a');g.addColorStop(1,'#0a3318');x.fillStyle=g;x.fillRect(0,0,s,s);x.fillStyle='#b8f2a3';x.font=`bold ${s*.45}px sans-serif`;x.textAlign='center';x.textBaseline='middle';x.fillText([...txt][0]?.toUpperCase()||'I',s/2,s*.54);return new Promise(r=>c.toBlob(async b=>r(await u8(b)),'image/png'))}
+async function entries(p,base,pwa){
+ const out=[],map={};
+ for(const k of Object.keys(p.files))map[k]=await u8(p.files[k]);
+ const top=p.main.includes('/')?null:p.main;
+ if(!map['index.html']){
+  if(top)map['index.html']=map[p.main];
+  else map['index.html']=new TextEncoder().encode(`<!doctype html><meta charset="utf-8"><meta http-equiv="refresh" content="0;url=${encodeURI(p.main)}"><a href="${encodeURI(p.main)}">${esc(p.name)}</a>`)}
+ if(pwa){
+  let h=new TextDecoder().decode(map['index.html']);
+  const head=`<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#0a3318"><link rel="apple-touch-icon" href="icon-192.png">`,sc=`<script>if('serviceWorker'in navigator)navigator.serviceWorker.register('service-worker.js')<\/script>`;
+  if(!/rel=["']?manifest/i.test(h))h=/<\/head>/i.test(h)?h.replace(/<\/head>/i,head+'</head>'):head+h;
+  h=/<\/body>/i.test(h)?h.replace(/<\/body>/i,sc+'</body>'):h+sc;
+  map['index.html']=new TextEncoder().encode(h);
+  map['icon-192.png']=await icon(p.name,192);map['icon-512.png']=await icon(p.name,512);
+  map['manifest.webmanifest']=new TextEncoder().encode(JSON.stringify({name:p.name,short_name:p.name.slice(0,12),start_url:'./',scope:'./',display:'standalone',background_color:'#0a3318',theme_color:'#0a3318',icons:[{src:'icon-192.png',sizes:'192x192',type:'image/png',purpose:'any maskable'},{src:'icon-512.png',sizes:'512x512',type:'image/png',purpose:'any maskable'}]},null,2));
+  const fl=['./',...Object.keys(map).map(k=>'./'+k.split('/').map(encodeURIComponent).join('/'))];
+  map['service-worker.js']=new TextEncoder().encode(`const C='pwa-${Date.now()}';const F=${JSON.stringify(fl)};\nconst clean=async r=>{if(!r.redirected)return r;const b=await r.blob();return new Response(b,{status:r.status,statusText:r.statusText,headers:r.headers})};\nself.addEventListener('install',e=>{e.waitUntil(caches.open(C).then(c=>Promise.all(F.map(async u=>{try{const r=await fetch(u,{cache:'reload'});if(r.ok)await c.put(u,await clean(r))}catch(_){}}))));self.skipWaiting()});\nself.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x!==C).map(x=>caches.delete(x)))));self.clients.claim()});\nself.addEventListener('fetch',e=>{if(e.request.method!=='GET')return;if(e.request.mode==='navigate')e.respondWith(fetch(e.request).catch(()=>caches.match('./')));else e.respondWith(caches.match(e.request,{ignoreSearch:true}).then(r=>r||fetch(e.request)))});`)}
+ for(const k of Object.keys(map))out.push({n:base+'/'+k,d:map[k]});
+ return out}
+async function exp(p,pwa){toast(L('جارٍ التصدير…','Exporting…'));dl(await makeZip(await entries(p,safe(p.name)||'project',pwa)),(safe(p.name)||'project')+(pwa?'-pwa':'')+'.zip')}
+async function exportMany(ids,name,skip){
+ const ps=ids?P.filter(p=>ids.includes(p.fid)):P;if(!ps.length)return toast(L('لا توجد مشاريع للتصدير','Nothing to export'));
+ toast(L('جارٍ التجهيز…','Preparing…'));const used=new Set(),list=[];
+ for(const p of ps){const base=pBase(p,Math.max(0,skip));let x=base,i=2;while(used.has(x))x=base+'-'+i++;used.add(x);list.push(...await entries(p,x,false))}
+ dl(await makeZip(list),(safe(name)||'export')+'.zip')}
+/* ---------- Preview ---------- */
+function resolve(from,ref){if(!ref||/^([a-z][a-z0-9+.-]*:|\/\/|#)/i.test(ref))return null;let r=ref.split('#')[0].split('?')[0];try{r=decodeURIComponent(r)}catch{}
+ const parts=(r.startsWith('/')?r:from.replace(/[^/]*$/,'')+r).split('/'),o=[];for(const s of parts){if(s==='..')o.pop();else if(s&&s!=='.')o.push(s)}return o.join('/')}
+async function preview(p){
+ const urls={},tmp=[],mk=(b,t)=>{const u=URL.createObjectURL(b.slice(0,b.size,t||b.type));tmp.push(u);return u};
+ for(const k of Object.keys(p.files))if(!/\.(css|html?)$/i.test(k))urls[k]=mk(p.files[k],mime(k));
+ const cssFix=(t,from)=>t.replace(/url\(\s*(['"]?)([^'")]+)\1\s*\)/g,(m,q,u)=>{const r=resolve(from,u);return r&&urls[r]?`url("${urls[r]}")`:m});
+ for(const k of Object.keys(p.files))if(/\.css$/i.test(k))urls[k]=mk(new Blob([cssFix(await p.files[k].text(),k)]),'text/css');
+ const doc=new DOMParser().parseFromString(await p.files[p.main].text(),'text/html');
+ doc.querySelectorAll('[src],link[href]').forEach(el=>{const at=el.hasAttribute('src')?'src':'href',r=resolve(p.main,el.getAttribute(at));if(r&&urls[r])el.setAttribute(at,urls[r])});
+ doc.querySelectorAll('style').forEach(s=>s.textContent=cssFix(s.textContent,p.main));
+ doc.querySelectorAll('[style]').forEach(el=>el.setAttribute('style',cssFix(el.getAttribute('style'),p.main)));
+ doc.querySelectorAll('[srcset]').forEach(el=>el.setAttribute('srcset',el.getAttribute('srcset').split(',').map(s=>{const [u,...r]=s.trim().split(/\s+/),x=resolve(p.main,u);return (x&&urls[x]||u)+(r.length?' '+r.join(' '):'')}).join(', ')));
+ const src=mk(new Blob(['<!doctype html>'+doc.documentElement.outerHTML]),'text/html');
+ const d=modal(`<div class="tp"><b>${esc(p.name)}</b><button class="b" id="cl">${ic('x')}${L('إغلاق','Close')}</button></div><iframe sandbox="allow-scripts allow-forms allow-modals allow-popups allow-same-origin" src="${src}"></iframe>`,'pv');
+ d.querySelector('#cl').onclick=()=>d.close();d.addEventListener('close',()=>tmp.forEach(u=>URL.revokeObjectURL(u)))}
+/* ---------- Files & editor ---------- */
+async function files(p){
+ const d=modal('');
+ const draw=()=>{const ks=Object.keys(p.files).sort();
+  d.querySelector('.mb').innerHTML=`<h3>${esc(p.name)}</h3><div class="row" style="margin:0 0 8px"><button class="b" id="af">${ic('plus')}${L('إضافة ملفات','Add files')}</button><button class="b" id="ad">${ic('files')}${L('إضافة مجلد','Add folder')}</button><button class="b g" id="cl">${ic('x')}${L('إغلاق','Close')}</button></div>`+ks.map((k,i)=>`<div class="f"><span>${esc(k)} ${k===p.main?'★':''}<br><small>${fsize(p.files[k].size)}</small></span>${isText(k)?`<button class="b" data-e="${i}">${ic('edit')}</button>`:''}${/\.html?$/i.test(k)&&k!==p.main?`<button class="b" data-m="${i}">★</button>`:''}<button class="b" data-d="${i}">${ic('trash')}</button></div>`).join('');
+  const q=s=>d.querySelector(s);q('#cl').onclick=()=>{d.close();render()};
+  q('#af').onclick=()=>pick('#fa');q('#ad').onclick=()=>pick('#fd2');
+  d.querySelectorAll('[data-e]').forEach(b=>b.onclick=()=>edit(ks[b.dataset.e]));
+  d.querySelectorAll('[data-m]').forEach(b=>b.onclick=async()=>{p.main=ks[b.dataset.m];await put('p',p);toast(L('تم تعيين الصفحة الرئيسية (تُصدَّر كـ index.html)','Main page set (exported as index.html)'));draw()});
+  d.querySelectorAll('[data-d]').forEach(b=>b.onclick=async()=>{const k=ks[b.dataset.d];if(k===p.main)return toast(L('لا يمكن حذف الصفحة الرئيسية','Cannot delete the main page'));delete p.files[k];await put('p',p);draw()})};
+ const pick=sel=>{const i=$(sel);i.onchange=async e=>{const arr=[...e.target.files];e.target.value='';let prefix='';if(sel==='#fa'){const r=await ask(L('المجلد داخل المشروع (اختياري)','Folder inside project (optional)'),[['f','','','images']],L('إضافة','Add'));if(!r)return;prefix=norm(r.f||'')}
+  for(const f of arr){const rel=f.webkitRelativePath?f.webkitRelativePath.split('/').slice(1).join('/'):f.name;p.files[norm((prefix?prefix+'/':'')+rel)]=new Blob([f],{type:mime(f.name)})}
+  await put('p',p);toast(L('تمت الإضافة','Added'));draw()};i.click()};
+ draw();
+ async function edit(k){const t=await p.files[k].text();const e=modal(`<h3>${esc(k)}</h3><textarea id="ta"></textarea><div class="row"><button class="b g" id="sv">${L('حفظ','Save')}</button><button class="b" id="cc">${L('إلغاء','Cancel')}</button></div>`);
+  e.querySelector('#ta').value=t;e.querySelector('#cc').onclick=()=>e.close();
+  e.querySelector('#sv').onclick=async()=>{p.files[k]=new Blob([e.querySelector('#ta').value],{type:mime(k)});await put('p',p);toast(L('تم الحفظ','Saved'));e.close();draw()}}}
+applyCfg();
+if('serviceWorker'in navigator)addEventListener('load',()=>navigator.serviceWorker.register('service-worker.js').catch(()=>{}));
+migrate().catch(console.error).then(render);
+</script>
+</body>
+</html>
